@@ -1,3 +1,7 @@
 /env
 *.pyc
 
+1.txt
+/results
+/midi
+out.mid
