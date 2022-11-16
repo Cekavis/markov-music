@@ -8,7 +8,7 @@ import random
 
 Note = namedtuple('Note', ['note', 'duration'])
 
-ORDER = 3
+ORDER = 2
 
 class MarkovChain:
 
@@ -50,13 +50,14 @@ class MarkovChain:
             for note in to_notes:
                 if note not in columns:
                     columns.append(note)
-        _col = lambda string: '{:<8}'.format(string)
+        _col1 = lambda string: '{:<20}'.format(string)
+        _col2 = lambda string: '{:<8}'.format(string)
         _note = lambda note: '{}:{}'.format(note.note, note.duration)
-        out = _col('')
-        out += ''.join([_col(_note(note)) for note in columns[:limit]]) + '\n'
+        out = _col1('')
+        out += ''.join([_col2(_note(note)) for note in columns[:limit]]) + '\n'
         for from_notes, to_notes in self.chain.items():
-            out += _col('+'.join([_note(x) for x in from_notes]))
+            out += _col1('+'.join([_note(x) for x in from_notes]))
             for note in columns[:limit]:
-                out += _col(to_notes[note])
+                out += _col2(to_notes[note])
             out += '\n'
         print(out)
