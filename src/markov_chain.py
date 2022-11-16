@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # This class handles the storage and manipulation of a markov chain of notes.
+# v2: Record the duration of both 'from_note' and 'to_note' in the transition
 
 from collections import Counter, defaultdict, namedtuple
 
@@ -13,15 +14,6 @@ class MarkovChain:
         self.chain = defaultdict(Counter)
         self.sums = defaultdict(int)
 
-    @staticmethod
-    def create_from_dict(dict):
-        m = MarkovChain()
-        # bugged!
-        for from_note, to_notes in dict.items():
-            for k, v in to_notes.items():
-                m.add(from_note, k, v)
-        return m
-
     def _serialize(self, note, duration):
         return Note(note, duration)
 
@@ -29,8 +21,8 @@ class MarkovChain:
         return str(self.get_chain())
 
     def add(self, from_note, to_note, duration):
-        self.chain[from_note][self._serialize(to_note, duration)] += 1
-        self.sums[from_note] += 1
+        self.chain[self._serialize(from_note, duration)][self._serialize(to_note, duration)] += 1
+        self.sums[self._serialize(from_note, duration)] += 1
 
     def get_next(self, seed_note):
         if seed_note is None or seed_note not in self.chain:
@@ -64,7 +56,7 @@ class MarkovChain:
         out = _col('')
         out += ''.join([_col(_note(note)) for note in columns[:limit]]) + '\n'
         for from_note, to_notes in self.chain.items():
-            out += _col(from_note)
+            out += _col(_note(from_note))
             for note in columns[:limit]:
                 out += _col(to_notes[note])
             out += '\n'

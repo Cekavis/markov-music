@@ -38,22 +38,21 @@ class Parser:
         notes_sequence = []
         note_start_time = {}
         time = 0
-        # Assume there is only 1 track and it is monophonic
-        assert len(midi.tracks) == 1
-        track = midi.tracks[0]
-        for message in track:
-            if verbose:
-                print(message)
-            if message.type == "set_tempo":
-                self.tempo = message.tempo
-            elif message.type == "note_on" or message.type == "note_off":
-                time += message.time
-                # If the note is off
-                if message.velocity == 0 or message.type == "note_off":
-                    notes_sequence.append((message.note, time - note_start_time[message.note]))
-                # If the note is on
-                else:
-                    note_start_time[message.note] = time
+        # Assume it is monophonic
+        for track in midi.tracks:
+            for message in track:
+                if verbose:
+                    print(message)
+                if message.type == "set_tempo":
+                    self.tempo = message.tempo
+                if message.type == "note_on" or message.type == "note_off":
+                    time += message.time
+                    # If the note is off
+                    if message.velocity == 0 or message.type == "note_off":
+                        notes_sequence.append((message.note, time - note_start_time[message.note]))
+                    # If the note is on
+                    else:
+                        note_start_time[message.note] = time
         # Add every pair of adjacent notes to the markov chain
         for i in range(len(notes_sequence) - 1):
             self._sequence([notes_sequence[i][0]],
