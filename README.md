@@ -1,27 +1,9 @@
 # markov-music
 
-This repository contains code that analyzes MIDI tracks and generates a markov
-chain based on the note sequences in the MIDI.
-Read the article [here](https://medium.com/@omgimanerd/generating-music-using-markov-chains-40c3f3f46405#.1wukhwbrt).
+## branch v3 修改内容
 
-## Setup
-```
-pip install -r requirements.txt
-```
-
-## Methodology
-[Click here](http://www.music-software-development.com/midi-tutorial.html)
-for a reference on how MIDIs are encoded.
-
-Refer to this
-[article](https://medium.com/@omgimanerd/generating-music-using-markov-chains-40c3f3f46405#.1wukhwbrt)
-for more details on the implementation of the music generator.
-
-## Contributing
-Fork this repository and clone it to your own computer. Send me a pull request
-with interesting thoughts, ideas, or suggestions.
-Please follow the [PEP8](http://pep8.org) standard if you are contributing
-to the codebase. Avoid pushing large MIDI files if possible.
-
-## Contributors
-Alvin Lin (omgimanerd)
+*   支持了高阶 Markov Chain，可以在 `markov_chain.py` 内修改参数 `ORDER`。
+*   音高和时长为一个整体作为 Markov Chain 的元素，所以时长不同的相同音高的音被认为是完全不同的。
+*   时长上取整到 30ms，可以在 midi_parser.py 内修改。
+*   修了 parser 名字冲突的问题。
+*   改了 Parser 类中解析文件的逻辑，仅支持单声（多声会按照 midi 文件中 message 的顺序转为在保持原本时长的前提下转为一个单声的序列）
