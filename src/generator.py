@@ -2,7 +2,7 @@
 # This class handles the generation of a new song given a markov chain
 # containing the note transitions and their frequencies.
 
-from markov_chain import MarkovChain
+from markov_chain import MarkovChain, ORDER
 
 import random
 import mido
@@ -28,10 +28,13 @@ class Generator:
     def generate(self, filename):
         with mido.midifiles.MidiFile() as midi:
             track = mido.MidiTrack()
-            last_note = None
+            # Select a random starting notes sequence
+            valid_starting_notes = list(self.markov_chain.chain.keys())
+            melody = list(random.choice(valid_starting_notes))
             # Generate a sequence of 100 notes
             for i in range(100):
-                new_note = self.markov_chain.get_next(last_note)
+                new_note = self.markov_chain.get_next(tuple(melody[-ORDER:]))
+                melody.append(new_note)
                 track.extend(self._note_to_messages(new_note))
             midi.tracks.append(track)
             midi.save(filename)

@@ -6,7 +6,7 @@ import hashlib
 import mido
 import argparse
 
-from markov_chain import MarkovChain, Note
+from markov_chain import MarkovChain, Note, ORDER
 
 class Parser:
 
@@ -50,13 +50,14 @@ class Parser:
                     # If the note is off
                     if message.velocity == 0 or message.type == "note_off":
                         notes_sequence.append(
-                            Note(message.note, time - note_start_time[message.note]))
+                            Note(message.note,
+                                 self._bucket_duration(time - note_start_time[message.note])))
                     # If the note is on
                     else:
                         note_start_time[message.note] = time
         # Add every pair of adjacent notes to the markov chain
-        for i in range(len(notes_sequence) - 1):
-            self.markov_chain.add(notes_sequence[i], notes_sequence[i + 1])
+        for i in range(len(notes_sequence) - ORDER):
+            self.markov_chain.add(tuple(notes_sequence[i: i+ORDER]), notes_sequence[i+ORDER])
 
 
     def _bucket_duration(self, ticks):
