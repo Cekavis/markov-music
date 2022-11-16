@@ -14,15 +14,12 @@ class MarkovChain:
         self.chain = defaultdict(Counter)
         self.sums = defaultdict(int)
 
-    def _serialize(self, note, duration):
-        return Note(note, duration)
-
     def __str__(self):
         return str(self.get_chain())
 
-    def add(self, from_note, to_note, duration):
-        self.chain[self._serialize(from_note, duration)][self._serialize(to_note, duration)] += 1
-        self.sums[self._serialize(from_note, duration)] += 1
+    def add(self, from_note, to_note):
+        self.chain[from_note][to_note] += 1
+        self.sums[from_note] += 1
 
     def get_next(self, seed_note):
         if seed_note is None or seed_note not in self.chain:
