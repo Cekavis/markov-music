@@ -35,23 +35,30 @@ class Parser:
         """
         midi = mido.MidiFile(self.filename)
         self.ticks_per_beat = midi.ticks_per_beat
-        previous_chunk = []
-        current_chunk = []
-        for track in midi.tracks:
-            for message in track:
-                if verbose:
-                    print(message)
-                if message.type == "set_tempo":
-                    self.tempo = message.tempo
-                elif message.type == "note_on":
-                    if message.time == 0:
-                        current_chunk.append(message.note)
-                    else:
-                        self._sequence(previous_chunk,
-                                       current_chunk,
-                                       message.time)
-                        previous_chunk = current_chunk
-                        current_chunk = []
+        notes_sequence = []
+        note_start_time = {}
+        time = 0
+        # Assume there is only 1 track and it is monophonic
+        assert len(midi.tracks) == 1
+        track = midi.tracks[0]
+        for message in track:
+            if verbose:
+                print(message)
+            if message.type == "set_tempo":
+                self.tempo = message.tempo
+            elif message.type == "note_on" or message.type == "note_off":
+                time += message.time
+                # If the note is off
+                if message.velocity == 0 or message.type == "note_off":
+                    notes_sequence.append((message.note, time - note_start_time[message.note]))
+                # If the note is on
+                else:
+                    note_start_time[message.note] = time
+        # Add every pair of adjacent notes to the markov chain
+        for i in range(len(notes_sequence) - 1):
+            self._sequence([notes_sequence[i][0]],
+                           [notes_sequence[i + 1][0]],
+                           notes_sequence[i + 1][1])
 
     def _sequence(self, previous_chunk, current_chunk, duration):
         """
@@ -68,11 +75,11 @@ class Parser:
     def _bucket_duration(self, ticks):
         """
         This method takes a tick count and converts it to a time in
-        milliseconds, bucketing it to the nearest 250 milliseconds.
+        milliseconds, bucketing it to the nearest 30 milliseconds.
         """
         try:
             ms = ((ticks / self.ticks_per_beat) * self.tempo) / 1000
-            return int(ms - (ms % 250) + 250)
+            return int(ms - (ms % 30) + 30)
         except TypeError:
             raise TypeError(
                 "Could not read a tempo and ticks_per_beat from midi")
