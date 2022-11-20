@@ -63,11 +63,11 @@ class Parser:
     def _bucket_duration(self, ticks):
         """
         This method takes a tick count and converts it to a time in
-        milliseconds, bucketing it to the nearest 30 milliseconds.
+        milliseconds, bucketing it to the nearest 120 milliseconds.
         """
         try:
             ms = ((ticks / self.ticks_per_beat) * self.tempo) / 1000
-            return int(ms - (ms % 30) + 30)
+            return int(ms - (ms % 120) + 120)
         except TypeError:
             raise TypeError(
                 "Could not read a tempo and ticks_per_beat from midi")
