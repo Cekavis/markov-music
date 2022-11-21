@@ -1,5 +1,3 @@
-# markov-music
-
 ## branch v3 修改内容
 
 *   支持了高阶 Markov Chain，可以在 `markov_chain.py` 内修改参数 `ORDER`。
