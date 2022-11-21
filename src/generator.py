@@ -47,6 +47,7 @@ if __name__ == "__main__":
         from midi_parser import Parser
         chain = Parser(sys.argv[1]).get_chain()
         Generator.load(chain).generate(sys.argv[2])
+        chain.print_as_matrix()
         print('Generated markov chain')
     else:
         print('Invalid number of arguments:')
